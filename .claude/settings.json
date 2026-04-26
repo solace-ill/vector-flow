@@ -11,6 +11,9 @@
       "Bash(git log*)",
       "Bash(git branch*)",
       "Bash(git rev-parse*)",
+      "Bash(git add*)",
+      "Bash(git commit*)",
+      "Bash(git push*)",
       "Bash(ls *)",
       "Bash(dir *)",
       "Bash(python -m json.tool*)",
@@ -127,6 +130,12 @@
             "type": "command",
             "command": "bash .claude/hooks/session-stop.sh",
             "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/auto-commit.sh",
+            "timeout": 30,
+            "statusMessage": "Committing work to GitHub..."
           }
         ]
       }
