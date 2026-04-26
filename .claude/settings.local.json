@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh repo *)",
+      "Bash(gh api *)",
+      "Skill(prototype)",
+      "Skill(design-system)",
+      "Skill(map-systems)",
+      "Bash(gh auth *)",
+      "Bash(git *)"
+    ]
+  }
+}

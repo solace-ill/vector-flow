@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://chieh4un8vj7x"]
+
+[ext_resource type="Script" uid="uid://ddhto7ujhcsv" path="res://prototypes/wire-grapple-2d/test_level.gd" id="1_lvl"]
+[ext_resource type="PackedScene" path="res://prototypes/wire-grapple-2d/player.tscn" id="2_plr"]
+
+[node name="TestLevel" type="Node2D" unique_id=2075426826]
+script = ExtResource("1_lvl")
+
+[node name="Player" parent="." unique_id=1947100958 instance=ExtResource("2_plr")]
+position = Vector2(0, 310)
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1504372054]
+zoom = Vector2(1.5, 1.5)

@@ -1,0 +1,26 @@
+# Godot 4 generated files
+.godot/
+*.translation
+
+# Export targets
+/android/
+/ios/
+/web/
+/windows/
+/linux/
+/macos/
+
+# Exported binaries
+*.elf
+*.pck
+*.zip
+*.apk
+*.aab
+
+# Claude Code session state (ephemeral)
+production/session-state/
+production/session-logs/
+
+# OS
+.DS_Store
+Thumbs.db
