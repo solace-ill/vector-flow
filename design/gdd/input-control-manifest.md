@@ -76,7 +76,47 @@
 
 ## 4. Formulas
 
-<!-- TODO -->
+### F-1: 溜め攻撃判定
+
+```
+is_charge = (charge_timer >= CHARGE_THRESHOLD)
+
+変数:
+  charge_timer     : 左クリック押下からの経過秒数 [s]
+  CHARGE_THRESHOLD : 溜め判定の閾値（デフォルト 0.4s）
+
+例:
+  charge_timer = 0.39s → is_charge = false → 通常攻撃
+  charge_timer = 0.40s → is_charge = true  → 溜め攻撃
+```
+
+### F-2: マウス照準ベクトル（KB/M）
+
+```
+wire_direction = (mouse_world_pos - player_pos).normalized()
+
+変数:
+  mouse_world_pos : get_global_mouse_position() で取得したワールド座標
+  player_pos      : プレイヤーのグローバル座標
+
+結果: 長さ1の単位ベクトル。ワイヤーシステムに渡す。
+```
+
+### F-3: スティック照準ベクトル（ゲームパッド）
+
+```
+stick_raw = Input.get_vector("move_left", "move_right", "move_up", "move_down")
+※ 照準専用スティックは右スティック（将来実装）
+
+if stick_raw.length() >= STICK_DEADZONE:
+    wire_direction = stick_raw.normalized()
+else:
+    wire_direction = last_wire_direction  # 前回の方向を維持
+
+変数:
+  STICK_DEADZONE       : スティックの無効帯（デフォルト 0.2）
+  last_wire_direction  : 直前に確定した照準方向（初期値: Vector2.RIGHT）
+```
 
 ---
 
