@@ -19,7 +19,78 @@
 
 ## 3. Detailed Rules
 
-<!-- TODO -->
+### 3-1. 有限ステートマシン（FSM）
+
+| ステート | 説明 |
+|---------|------|
+| `IDLE` | 地上、速度ゼロ、移動入力なし |
+| `RUN` | 地上、水平移動中 |
+| `AIRBORNE` | 空中（上昇・下降を区別しない） |
+| `WALL_ATTACHED` | 壁に張り付き中 |
+| `CROUCH` | 地上、しゃがみ入力保持中 |
+| `WIRE_TRAVEL` | ワイヤー引き寄せ移動中（ワイヤーシステムが遷移を要求） |
+
+**遷移ルール**
+
+```
+IDLE        → RUN           : 移動入力あり
+IDLE        → AIRBORNE      : ジャンプ入力 または 足場消失（落下）
+IDLE        → CROUCH        : しゃがみ入力
+
+RUN         → IDLE          : 移動入力なし かつ 速度≒0
+RUN         → AIRBORNE      : ジャンプ入力 または 足場消失
+RUN         → CROUCH        : しゃがみ入力
+
+AIRBORNE    → IDLE/RUN      : 着地
+AIRBORNE    → WALL_ATTACHED : 壁接触 かつ 壁方向へ入力中
+
+WALL_ATTACHED → AIRBORNE   : ジャンプ入力（壁蹴り）または 壁方向への入力解除
+WALL_ATTACHED → IDLE/RUN   : 着地
+
+CROUCH      → IDLE          : しゃがみ解除 かつ 移動入力なし
+CROUCH      → RUN           : しゃがみ解除 かつ 移動入力あり
+
+任意ステート → WIRE_TRAVEL  : ワイヤーが着弾点に到達（ワイヤーシステムが発火）
+WIRE_TRAVEL → AIRBORNE     : 着弾点に到着
+```
+
+---
+
+### 3-2. 移動ルール
+
+| 環境 | 加速 | 減速 | 最大速度 |
+|------|------|------|---------|
+| 地上（RUN） | `RUN_ACCEL` | `RUN_DECEL` | `MAX_RUN_SPEED` |
+| 空中（AIRBORNE） | `AIR_ACCEL`（地上より低い） | `AIR_DECEL`（ほぼなし） | `MAX_AIR_SPEED` |
+| しゃがみ（CROUCH） | `RUN_ACCEL` | `RUN_DECEL` | `MAX_CROUCH_SPEED`（RUN の 50%） |
+| 壁張り付き（WALL_ATTACHED） | 水平移動なし | — | 重力無効、壁沿いに `WALL_SLIDE_SPEED` で下降 |
+| ワイヤー移動（WIRE_TRAVEL） | ワイヤーシステムが速度を上書き | — | ワイヤーシステムが定義 |
+
+---
+
+### 3-3. ジャンプルール
+
+- **通常ジャンプ**: `IDLE` / `RUN` / `CROUCH` から `jump` 入力 → 上方向に `JUMP_FORCE` を付与
+- **コヨーテタイム**: 足場から離れた後 `COYOTE_FRAMES` フレーム以内なら地上ジャンプ可
+- **壁蹴りジャンプ**: `WALL_ATTACHED` から `jump` 入力 → 壁の反対方向 + 上方向に `WALL_KICK_FORCE` を付与
+- **二段ジャンプ**: なし（ワイヤーで代替）
+
+---
+
+### 3-4. しゃがみルール
+
+- 当たり判定を縦方向に 40% 縮小（`CollisionShape2D` を切り替え）
+- 最大速度を `MAX_CROUCH_SPEED` に制限
+- しゃがみ解除時、天井がある場合は解除しない
+
+---
+
+### 3-5. 衝突レイヤー
+
+| レイヤー | 用途 |
+|---------|------|
+| `layer_1` | 地形（常時有効） |
+| `layer_2` | エネミー当たり判定（`WIRE_TRAVEL` 中は無効） |
 
 ---
 
