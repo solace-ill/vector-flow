@@ -96,7 +96,82 @@ WIRE_TRAVEL → AIRBORNE     : 着弾点に到着
 
 ## 4. Formulas
 
-<!-- TODO -->
+### F-1: 水平移動（加速）
+
+```
+velocity.x += direction * ACCEL * delta
+velocity.x = clamp(velocity.x, -MAX_SPEED, MAX_SPEED)
+
+変数:
+  direction : -1（左）/ 0（入力なし）/ 1（右）
+  ACCEL     : 環境別加速定数（RUN_ACCEL / AIR_ACCEL）
+  MAX_SPEED : 環境別上限（MAX_RUN_SPEED / MAX_AIR_SPEED）
+```
+
+### F-2: 水平移動（減速）
+
+```
+velocity.x = move_toward(velocity.x, 0, DECEL * delta)
+
+変数:
+  DECEL : 環境別減速定数（RUN_DECEL / AIR_DECEL）
+  ※ move_toward はゼロを超えて反転しないため符号の心配不要
+```
+
+### F-3: 重力
+
+```
+velocity.y += GRAVITY * delta
+velocity.y = min(velocity.y, MAX_FALL_SPEED)
+
+変数:
+  GRAVITY       : 重力加速度（下方向が正）
+  MAX_FALL_SPEED: 終端速度の上限
+  ※ WALL_ATTACHED / WIRE_TRAVEL 中は適用しない
+```
+
+### F-4: 通常ジャンプ
+
+```
+velocity.y = -JUMP_FORCE
+
+変数:
+  JUMP_FORCE : 上方向への初速（正値。負符号で上方向に変換）
+
+例: JUMP_FORCE = 600 → velocity.y = -600
+```
+
+### F-5: 壁蹴りジャンプ
+
+```
+velocity.x = wall_normal.x * WALL_KICK_H
+velocity.y = -WALL_KICK_V
+
+変数:
+  wall_normal  : get_wall_normal() で取得した壁の法線ベクトル
+  WALL_KICK_H  : 水平方向の蹴り出し速度
+  WALL_KICK_V  : 上方向の蹴り出し速度
+
+例: 右壁から蹴る場合 → wall_normal.x = -1 → velocity.x = -WALL_KICK_H（左方向）
+```
+
+### F-6: コヨーテタイム
+
+```
+# 着地中は毎フレームリセット
+if is_on_floor():
+    coyote_timer = COYOTE_FRAMES
+
+# 空中では毎フレームデクリメント
+else:
+    coyote_timer = max(coyote_timer - 1, 0)
+
+# ジャンプ可否判定
+can_jump = (coyote_timer > 0)
+
+変数:
+  COYOTE_FRAMES : コヨーテタイムのフレーム数（デフォルト 6）
+```
 
 ---
 
